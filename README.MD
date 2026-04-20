@@ -1,40 +1,61 @@
-# Playwright with puppeteer-stealth
+# ProfileVault Browser Server
 
-A basic Playwright setup with stealth plugin for bot detection testing and web automation. **Note: This template prioritizes compatibility and ease of use over perfect stealth.**
-There are stronger stealth contenders that I will update / add as a template soon.
+Servidor de sessões de browser com **Playwright + puppeteer-stealth + noVNC** para o ProfileVault.
+O usuário interage com o browser em tempo real via iframe (noVNC).
 
-## What it does
+---
 
-- Uses `playwright-extra` with `puppeteer-extra-plugin-stealth` for basic bot detection bypass
-- Launches a headless Chrome browser and tests against SannySoft bot detection
-- Provides detailed test results showing which detection methods pass/fail
-- Built with TypeScript for better development experience
+## Deploy no Railway (mais rápido)
 
-## ⚠️ Important Limitations
+### Opção 1 — Via GitHub (recomendado)
 
-**This template CAN be fingerprinted and detected by advanced anti-bot systems:**
+1. Copie a pasta `railway-server/` para um repositório GitHub novo
+2. No [railway.app](https://railway.app), clique em **New Project → Deploy from GitHub repo**
+3. Selecione o repositório
+4. Railway detecta o `Dockerfile` e faz o build automaticamente
 
-- ✅ **Works well for**: Basic testing, screenshots, simple automation, development
-- ❌ **Will be detected by**: Advanced fingerprinting sites, Cloudflare, modern anti-bot systems
-- 🎯 **Use case**: Development, testing, proof-of-concepts, educational purposes
+### Opção 2 — Via CLI
 
-**Docker Version Lock**: Uses Playwright v1.50.0 to match Microsoft's official Docker image (`mcr.microsoft.com/playwright:v1.50.0-noble`). Microsoft's images are often behind the latest Playwright releases, so this template is locked to maintain compatibility.
-Let me know if you find them too slow. I've build a few ones myself before.
+```bash
+npm install -g @railway/cli
+railway login
+cd railway-server
+railway init
+railway up
+```
 
-# 1-click install
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/playwright-ts-puppet?referralCode=dPr4mc)
-\
-(railway is pretty cool, I promise)
+---
 
+## Variáveis de ambiente obrigatórias no Railway
 
-## About railway
-It's one of the few places that allow easy deploys, have everything, without running into real limitations.
-Their bandwidth pricing is also fair. Need cheaper? Ovh + docker swarm! But don't call me to manage it.
+| Variável | Valor |
+|---|---|
+| `SERVICE_SECRET` | Mesmo valor do secret `RAILWAY_SERVICE_SECRET` no ProfileVault |
+| `PORT` | Preenchido automaticamente pelo Railway |
 
-## Eject repo to get your own code clone:
-1. In the service settings, under Source, find the Upstream Repo setting
-2. Click the Eject button
-3. Select the appropriate GitHub organization to create the new repository
-4. Click Eject service
+---
 
-For detailed instructions, see: [Railway Template eject Guide](https://docs.railway.com/guides/deploy#eject-from-template-repository)
+## Após o deploy
+
+1. Copie a URL do serviço Railway (ex: `https://profilevault-xxx.up.railway.app`)
+2. No ProfileVault, configure o secret `RAILWAY_SERVER_URL` com essa URL
+
+---
+
+## Endpoints
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/session/start` | Inicia sessão de browser |
+| POST | `/session/stop` | Encerra sessão |
+| GET | `/session/:id` | Status da sessão |
+| GET | `/health` | Health check |
+
+---
+
+## Como funciona
+
+- Cada perfil abre um **Chromium com stealth** em um display virtual (Xvfb)
+- O x11vnc captura o display e o websockify expõe via WebSocket
+- O noVNC transmite a tela via iframe no ProfileVault
+- Proxy, cookies, user-agent e fingerprint são aplicados no launch
