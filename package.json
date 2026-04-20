@@ -1,25 +1,14 @@
 {
-  "name": "playwright-basicstealth-ts",
+  "name": "profilevault-browser-server",
   "version": "1.0.0",
-  "main": "dist/main.js",
+  "main": "server.js",
   "scripts": {
-    "build": "tsc",
-    "start": "npm run build && node dist/main.js",
-    "dev": "ts-node main.ts",
-    "test": "npm run build && node dist/main.js"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@types/node": "^22.15.29",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
     "playwright-extra": "^4.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
-  },
-  "devDependencies": {
-    "playwright": "1.50.0"
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
